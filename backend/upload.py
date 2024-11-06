@@ -1,25 +1,15 @@
 from fastapi import UploadFile, File, HTTPException, Depends
 from sqlalchemy.orm import Session
-import os
-import pandas as pd
 from .database import get_db
 from .models import Passenger
-
-UPLOAD_DIR = os.path.join(os.path.dirname(__file__), 'input')  # Assurez-vous que ce soit un chemin absolu
+from .file_utils import save_file, read_csv_data
 
 async def upload_csv(file: UploadFile = File(...), db: Session = Depends(get_db)):
-    try:
-        # Sauvegarde du fichier téléchargé dans le dossier 'input'
-        if not os.path.exists(UPLOAD_DIR):
-            os.makedirs(UPLOAD_DIR)
-        file_location = os.path.join(UPLOAD_DIR, file.filename)
-        with open(file_location, "wb") as f:
-            f.write(file.file.read())
-        
-        # Lire le fichier CSV
-        data = pd.read_csv(file_location)
-    except Exception as e:
-        raise HTTPException(status_code=400, detail=f"Error reading CSV file: {str(e)}")
+    # Sauvegarde du fichier téléchargé dans le dossier 'input' en utilisant la fonction save_file
+    file_location = save_file(file)
+    
+    # Lire le fichier CSV en utilisant la fonction read_csv_data
+    data = read_csv_data(file_location)
 
     # Vérifier les colonnes nécessaires
     required_columns = ['PassengerId', 'Survived', 'Pclass', 'Name', 'Sex', 'Age', 'SibSp', 'Parch', 'Ticket', 'Fare']
