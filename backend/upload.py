@@ -5,19 +5,19 @@ from .models import Passenger
 from .file_utils import save_file, read_csv_data
 
 async def upload_csv(file: UploadFile = File(...), db: Session = Depends(get_db)):
-    # Sauvegarde du fichier téléchargé dans le dossier 'input' en utilisant la fonction save_file
+    # Save the uploaded file in the 'input' folder using the save_file function
     file_location = save_file(file)
     
-    # Lire le fichier CSV en utilisant la fonction read_csv_data
+    # Read the CSV file using the read_csv_data function
     data = read_csv_data(file_location)
 
-    # Vérifier les colonnes nécessaires
+    # Check for required columns
     required_columns = ['PassengerId', 'Survived', 'Pclass', 'Name', 'Sex', 'Age', 'SibSp', 'Parch', 'Ticket', 'Fare']
     for column in required_columns:
         if column not in data.columns:
             raise HTTPException(status_code=400, detail=f"Missing column in CSV file: {column}")
 
-    # Vérifier les doublons pour éviter d'insérer des données existantes
+    # Check for duplicates to avoid inserting existing data
     existing_ids = {p.PassengerId for p in db.query(Passenger.PassengerId).all()}
     new_passengers = [
         Passenger(
@@ -35,10 +35,9 @@ async def upload_csv(file: UploadFile = File(...), db: Session = Depends(get_db)
         for _, row in data.iterrows() if row['PassengerId'] not in existing_ids
     ]
 
-    # Insertion en masse des nouveaux passagers
+    # Bulk insert the new passengers
     if new_passengers:
         db.bulk_save_objects(new_passengers)
         db.commit()
 
     return {"status": "Data uploaded successfully", "new_entries": len(new_passengers)}
-

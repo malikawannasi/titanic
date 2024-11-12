@@ -1,30 +1,33 @@
 from fastapi import HTTPException, Depends
 from sqlalchemy.orm import Session
 import os
-import pandas as pd
 from .database import get_db
 from .models import Passenger
+from .file_utils import read_csv_data
 
 CSV_FILE_PATH = os.path.join(os.path.dirname(__file__), 'input', 'train.csv')
 
 def load_csv(db: Session = Depends(get_db)):
-    # Vérifier que le fichier CSV existe
+    # Check if the CSV file exists
     if not os.path.isfile(CSV_FILE_PATH):
-        raise HTTPException(status_code=404, detail="train.csv file not found or is not a file in 'input' directory.")
+        # Raise a FileNotFoundError with a more specific message
+        raise HTTPException(status_code=404, detail=f"File not found: {CSV_FILE_PATH}. Please ensure that 'train.csv' exists in the 'input' directory.")
 
     try:
-        # Lire le fichier CSV
-        data = pd.read_csv(CSV_FILE_PATH)
+        # Use the utility function to read the CSV file
+        data = read_csv_data(CSV_FILE_PATH)
+    except FileNotFoundError:
+        raise HTTPException(status_code=404, detail=f"The file {CSV_FILE_PATH} was not found.")
     except Exception as e:
-        raise HTTPException(status_code=400, detail=f"Error reading train.csv file: {str(e)}")
+        raise HTTPException(status_code=400, detail=f"Error reading the CSV file: {str(e)}")
 
-    # Vérifier les colonnes nécessaires
+    # Verify required columns
     required_columns = ['PassengerId', 'Survived', 'Pclass', 'Name', 'Sex', 'Age', 'SibSp', 'Parch', 'Ticket', 'Fare']
     for column in required_columns:
         if column not in data.columns:
             raise HTTPException(status_code=400, detail=f"Missing column in train.csv file: {column}")
 
-    # Vérifier les doublons pour éviter d'insérer des données existantes
+    # Check for duplicates to avoid inserting existing data
     existing_ids = {p.PassengerId for p in db.query(Passenger.PassengerId).all()}
     new_passengers = [
         Passenger(
@@ -42,6 +45,7 @@ def load_csv(db: Session = Depends(get_db)):
         for _, row in data.iterrows() if row['PassengerId'] not in existing_ids and not row.isnull().any()
     ]
 
+    # Insert new passengers if any are found
     if new_passengers:
         db.bulk_save_objects(new_passengers)
         db.commit()
@@ -49,7 +53,9 @@ def load_csv(db: Session = Depends(get_db)):
     return {"status": "Data loaded successfully from train.csv", "new_entries": len(new_passengers)}
 
 def get_passengers(survived: int = None, db: Session = Depends(get_db)):
+    # Query the database for passengers, optionally filtering by survival status
     query = db.query(Passenger)
     if survived is not None:
         query = query.filter(Passenger.Survived == survived)
     return query.all()
+
