@@ -1,5 +1,5 @@
 from sqlalchemy import Column, Integer, String, Float
-from .database import Base
+from database import Base
 
 # Define the Passenger model, representing a row in the "passengers" table
 class Passenger(Base):

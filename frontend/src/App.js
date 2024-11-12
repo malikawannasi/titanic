@@ -32,7 +32,7 @@ function App() {
                 console.error('Error:', error);
 
                 // Fallback to loading data from local data.json if API call fails
-                try {
+              /*  try {
                     const response = await fetch('/data.json');
                     if (!response.ok) {
                         throw new Error('Error while loading the JSON file');
@@ -47,7 +47,7 @@ function App() {
                     setData(filteredData); 
                 } catch (error) {
                     console.error('Fallback failed:', error);
-                }
+                }*/
             }
         };
 

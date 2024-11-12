@@ -1,9 +1,9 @@
 from fastapi import HTTPException, Depends
 from sqlalchemy.orm import Session
 import os
-from .database import get_db
-from .models import Passenger
-from .file_utils import read_csv_data
+from database import get_db
+from models import Passenger
+from file_utils import read_csv_data
 
 CSV_FILE_PATH = os.path.join(os.path.dirname(__file__), 'input', 'train.csv')
 

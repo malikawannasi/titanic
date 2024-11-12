@@ -1,8 +1,8 @@
 from fastapi import UploadFile, File, HTTPException, Depends
 from sqlalchemy.orm import Session
-from .database import get_db
-from .models import Passenger
-from .file_utils import save_file, read_csv_data
+from database import get_db
+from models import Passenger
+from file_utils import save_file, read_csv_data
 
 async def upload_csv(file: UploadFile = File(...), db: Session = Depends(get_db)):
     # Save the uploaded file in the 'input' folder using the save_file function
