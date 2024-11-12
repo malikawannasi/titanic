@@ -1,0 +1,37 @@
+name: Test Frontend and Backend
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  # Job pour tester le backend FastAPI (Python)
+  backend:
+    runs-on: ubuntu-latest
+    needs: frontend  # Ce job attend que le job frontend soit terminé
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up Python for Backend
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'  # Choisissez la version appropriée de Python
+
+      - name: Install dependencies for Backend
+        run: |
+          cd backend  # Naviguer vers le dossier backend
+          python -m venv venv  # Créer un environnement virtuel
+          source venv/bin/activate  # Activer l'environnement virtuel
+          pip install -r requirements.txt  # Installer les dépendances (assurez-vous d'avoir un requirements.txt)
+
+      - name: Run tests for Backend
+        run: |
+          cd backend  # Naviguer vers le dossier backend
+          source venv/bin/activate  # Activer l'environnement virtuel
+          pytest test_main.py  # Exécuter les tests du backend (assurez-vous que test_main.py est correct)
+
