@@ -7,7 +7,7 @@ WORKDIR /app
 COPY package.json ./
 
 # Si yarn.lock existe, copiez-le. Sinon, ignorez cette ligne.
-#COPY yarn.lock ./
+COPY yarn.lock ./
 
 RUN yarn install  # ou `npm install` si vous utilisez npm
 
