@@ -1,3 +1,16 @@
+Pour FrontEnd: 
+ Lance npm start 
+
+![alt text](image-3.png)
+![alt text](image-4.png)
+
+![alt text](image-5.png)
+![alt text](image-6.png)
+
+![alt text](image-7.png)
+![alt text](image-8.png)
+
+
 # API d'Upload de Fichiers CSV et Gestion des Passagers
 
 Cette API permet d'uploader des fichiers CSV, de les charger dans une base de données et de gérer les informations des passagers via des requêtes. Les données sont enregistrées dans une base de données relationnelle via SQLAlchemy.
@@ -93,3 +106,5 @@ Cette route permet de récupérer la liste des passagers présents dans la base 
 ![alt text](image.png)
 
 ![alt text](image-1.png)
+
+![alt text](image-2.png)
