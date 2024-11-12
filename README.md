@@ -1,3 +1,45 @@
+Voici un exemple de fichier README simple avec les commandes pour télécharger le projet, construire et lancer le backend et le frontend :
+
+```markdown
+# Instructions pour exécuter le projet
+
+1. **Clonez le projet depuis GitHub**  
+   ```bash
+   git clone <url-du-projet>
+   cd <nom-du-dossier-du-projet>
+   ```
+
+2. **Construisez les images Docker**  
+   Pour le backend et le frontend :
+   ```bash
+   docker-compose build
+   ```
+
+3. **Lancez les containers**  
+   Exécutez les services backend et frontend :
+   ```bash
+   docker-compose up
+   ```
+
+4. **Accédez à l'API Backend**  
+   Ouvrez votre navigateur et allez sur `http://localhost:8000/doc` pour accéder à la documentation de l'API.
+
+5. **Téléchargez un fichier CSV**  
+   Utilisez l'interface du backend pour télécharger un fichier CSV.
+
+6. **Accédez au Frontend**  
+   Ouvrez votre navigateur et allez sur `http://localhost:3000` pour voir l'application frontend.
+
+7. **Arrêtez les services**  
+   Lorsque vous avez fini, vous pouvez arrêter les services avec :
+   ```bash
+   docker-compose down
+   ```
+
+```
+
+Cela devrait suffire pour un démarrage rapide avec Docker Compose pour le projet.
+
 Pour FrontEnd: 
  Lance npm start 
 
