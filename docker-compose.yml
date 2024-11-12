@@ -7,10 +7,9 @@ services:
       - "8000:8000"
     volumes:
       - ./backend:/app
-    depends_on:
-      - db
+      - ./data:/app/data  # Volumes to persist SQLite data
     environment:
-      - DATABASE_URL=postgresql://postgres:postgres@db/titanic
+      - DATABASE_URL=sqlite:///./data/titanic.db  # SQLite connection string
 
   frontend:
     build: ./frontend
@@ -20,18 +19,4 @@ services:
       - ./frontend:/app
     stdin_open: true
     tty: true
-
-  db:
-    image: postgres:13
-    environment:
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgres
-      POSTGRES_DB: titanic
-    ports:
-      - "5432:5432"
-    volumes:
-      - postgres_data:/var/lib/postgresql/data
-
-volumes:
-  postgres_data:
 

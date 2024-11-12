@@ -1,20 +1,37 @@
-
 import React, { useState, useEffect } from 'react';
 import DataTable from './components/DataTable';
 import Filter from './components/Filter';
 import Chart from './components/Chart';
-import axios from 'axios';
 
 function App() {
     const [data, setData] = useState([]);
     const [filter, setFilter] = useState({ survived: '' });
 
     useEffect(() => {
-        axios.get('/api/passengers', { params: filter }).then(response => {
-            setData(response.data);
-        });
-    }, [filter]);
+        const fetchData = async () => {
+            try {
+                const response = await fetch('/data.json');
+                if (!response.ok) {
+                    throw new Error('Erreur de chargement du fichier JSON');
+                }
+                const jsonData = await response.json();
 
+                
+                const filteredData = jsonData.filter(item => {
+                    if (filter.survived !== '') {
+                        return item.Survived === parseInt(filter.survived);
+                    }
+                    return true; 
+                });
+
+                setData(filteredData); 
+            } catch (error) {
+                console.error('Erreur:', error);
+            }
+        };
+
+        fetchData();
+    }, [filter]); 
     return (
         <div>
             <Filter setFilter={setFilter} />

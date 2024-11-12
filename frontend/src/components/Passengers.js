@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from 'react';
-import { getPassengers } from '../api/api'; // Importer la fonction pour récupérer les passagers
 
 const Passengers = () => {
     const [passengers, setPassengers] = useState([]);
@@ -9,8 +8,12 @@ const Passengers = () => {
     useEffect(() => {
         const fetchPassengers = async () => {
             try {
-                const data = await getPassengers();
-                setPassengers(data); // Mettre à jour l'état avec les données des passagers
+                const response = await fetch('/data.json');
+                if (!response.ok) {
+                    throw new Error('Erreur lors du chargement du fichier JSON');
+                }
+                const data = await response.json(); 
+                setPassengers(data); 
             } catch (error) {
                 setError('Erreur lors du chargement des données');
             } finally {
