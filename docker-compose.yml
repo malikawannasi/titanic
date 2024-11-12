@@ -7,9 +7,9 @@ services:
       - "8000:8000"
     volumes:
       - ./backend:/app
-      - ./data:/app/data  # Volumes to persist SQLite data
+      - ./data:/app/data  
     environment:
-      - DATABASE_URL=sqlite:///./data/titanic.db  # SQLite connection string
+      - DATABASE_URL=sqlite:///./data/titanic.db  
 
   frontend:
     build: ./frontend
