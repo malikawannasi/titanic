@@ -36,10 +36,6 @@ Voici un exemple de fichier README simple avec les commandes pour télécharger 
    docker-compose down
    ```
 
-```
-
-Cela devrait suffire pour un démarrage rapide avec Docker Compose pour le projet.
-
 Pour FrontEnd: 
  Lance npm start 
 
