@@ -1,13 +1,14 @@
-# Utilisation de l'image officielle Python pour FastAPI
+# Use the official Python image for FastAPI
 FROM python:3.9-slim
 
-# Définition du répertoire de travail
+# Set the working directory
 WORKDIR /app
 
-# Copie des fichiers et installation des dépendances
+# Copy files and install dependencies
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 COPY . .
 
-# Lancer l'application avec Uvicorn
+# Run the application with Uvicorn
 CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"]
+

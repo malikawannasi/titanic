@@ -10,12 +10,12 @@ const Passengers = () => {
             try {
                 const response = await fetch('/data.json');
                 if (!response.ok) {
-                    throw new Error('Erreur lors du chargement du fichier JSON');
+                    throw new Error('Error while loading the JSON file');
                 }
                 const data = await response.json(); 
                 setPassengers(data); 
             } catch (error) {
-                setError('Erreur lors du chargement des données');
+                setError('Error while loading data');
             } finally {
                 setLoading(false);
             }

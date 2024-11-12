@@ -1,7 +1,7 @@
 
 import axios from 'axios';
 
-// Fonction pour récupérer les passagers
+// Function to retrieve passengers
 export const getPassengers = async () => {
     try {
         const response = await axios.get('http://localhost:8000/passengers');

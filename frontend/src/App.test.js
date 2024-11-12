@@ -1,50 +1,75 @@
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import App from './App';
 
-// Mock des composants enfants pour simplifier le test
+// Mocking the components DataTable, Filter, and Chart since we are focusing on App.js
 jest.mock('./components/DataTable', () => () => <div>DataTable Component</div>);
-jest.mock('./components/Filter', () => ({ setFilter }) => (
-  <div>
-    <button onClick={() => setFilter({ survived: '1' })}>Filter Survivors</button>
-  </div>
-));
+jest.mock('./components/Filter', () => ({ setFilter }) => {
+    return (
+        <button onClick={() => setFilter({ survived: '1' })}>Set Filter</button>
+    );
+});
 jest.mock('./components/Chart', () => () => <div>Chart Component</div>);
 
+// Mock the fetch function to simulate API responses
+global.fetch = jest.fn();
+
+// Mock console.error to check if error handling works
+beforeEach(() => {
+    jest.spyOn(console, 'error').mockImplementation(() => {});
+    fetch.mockClear();
+});
+
 describe('App Component', () => {
-  it('devrait afficher les composants DataTable, Filter et Chart', () => {
-    render(<App />);
+    test('should render App component and its children', () => {
+        render(<App />);
+        
+        // Check if the children components are rendered
+        expect(screen.getByText('DataTable Component')).toBeInTheDocument();
+        expect(screen.getByText('Chart Component')).toBeInTheDocument();
+    });
 
-    // Vérifie que les composants mockés sont rendus
-    expect(screen.getByText('DataTable Component')).toBeInTheDocument();
-    expect(screen.getByText('Chart Component')).toBeInTheDocument();
-  });
+    test('should fetch and display data on render', async () => {
+        // Mock successful fetch
+        fetch.mockResolvedValueOnce({
+            ok: true,
+            json: () => Promise.resolve([{ Survived: 1 }, { Survived: 0 }]),
+        });
 
-  it('devrait charger les données et appliquer le filtre correctement', async () => {
-    // Mock de la requête fetch
-    const mockData = [
-      { Survived: 1, Name: 'John' },
-      { Survived: 0, Name: 'Jane' },
-    ];
+        render(<App />);
 
-    global.fetch = jest.fn(() =>
-      Promise.resolve({
-        ok: true,
-        json: () => Promise.resolve(mockData),
-      })
-    );
+        // Wait for the data fetching to finish and state to update
+        await waitFor(() => expect(fetch).toHaveBeenCalledTimes(1));
 
-    render(<App />);
+        // Check if the fetch function is called
+        expect(fetch).toHaveBeenCalledWith('/data.json');
+    });
 
-    // Vérifie que les données sont chargées
-    await waitFor(() => expect(fetch).toHaveBeenCalledTimes(1));
+    test('should update data when filter is applied', async () => {
+        fetch.mockResolvedValueOnce({
+            ok: true,
+            json: () => Promise.resolve([{ Survived: 1 }, { Survived: 0 }]),
+        });
 
-    // Vérifie qu'aucune donnée n'est filtrée au début
-    expect(screen.getByText('DataTable Component')).toBeInTheDocument();
+        render(<App />);
 
-    // Simule un clic sur le bouton de filtrage (qui définit filter.survived = '1')
-    fireEvent.click(screen.getByText('Filter Survivors'));
+        // Simulate clicking the filter button to change the filter
+        fireEvent.click(screen.getByText('Set Filter'));
 
-    // Vérifie que le filtre a été appliqué en vérifiant la nouvelle donnée
-    await waitFor(() => expect(screen.getByText('DataTable Component')).toBeInTheDocument());
-  });
+        // Check if the data is updated after filter
+        await waitFor(() => {
+            expect(fetch).toHaveBeenCalledTimes(2); // fetch should be called again after filter change
+        });
+    });
+
+    test('should handle fetch error gracefully', async () => {
+        // Mock a failed fetch request
+        fetch.mockRejectedValueOnce(new Error('Error while loading the JSON file'));
+
+        render(<App />);
+
+        // Wait for the error to be caught
+        await waitFor(() => {
+            expect(console.error).toHaveBeenCalledWith('Erreur:', expect.any(Error));
+        });
+    });
 });
